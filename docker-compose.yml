@@ -68,7 +68,7 @@ services:
       command: ["npm", "start"]
       container_name: tplogistic-local-app-fe
       ports:
-      - 5000:5000
+      - 6000:6000
       env_file:
         - "./env/$ENV.env"
       depends_on:
