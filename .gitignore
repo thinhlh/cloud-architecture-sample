@@ -37,3 +37,4 @@ lerna-debug.log*
 env/
 *.env
 !template.env
+*.pem
