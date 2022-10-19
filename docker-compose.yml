@@ -20,9 +20,10 @@ services:
     build: 
       context: .
       dockerfile: ./docker/app-be/Dockerfile
-    command: ["npm", "run", "start"]
     env_file:
       - "./env/$ENV.env"
+    environment:
+    - OPTIMIZED=$OPTIMIZED
     depends_on:
       - db
       - cache
@@ -35,12 +36,13 @@ services:
     build: 
       context: .
       dockerfile: ./docker/app-be/Dockerfile
-    command: ["npm", "run", "start"]
     container_name: tplogistic-local-app-be
     ports:
       - 3000:3000
     env_file:
       - "./env/$ENV.env"
+    environment:
+      - OPTIMIZED=$OPTIMIZED
     depends_on:
       - db
       - cache
@@ -49,32 +51,32 @@ services:
       - cache
       - logging
 
-  app-fe:
-    build: 
-      context: .
-      dockerfile: ./docker/app-fe/Dockerfile
-    command: ["npm", "start"]
-    env_file:
-      - "./env/$ENV.env"
-    depends_on:
-      - app-be
-    links: 
-      - app-be
+  # app-fe:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./docker/app-fe/Dockerfile
+  #   command: ["npm", "start"]
+  #   env_file:
+  #     - "./env/$ENV.env"
+  #   depends_on:
+  #     - app-be
+  #   links: 
+  #     - app-be
 
-  local-app-fe:
-      build: 
-        context: .
-        dockerfile: ./docker/app-fe/Dockerfile
-      command: ["npm", "start"]
-      container_name: tplogistic-local-app-fe
-      ports:
-      - 6000:6000
-      env_file:
-        - "./env/$ENV.env"
-      depends_on:
-        - local-app-be
-      links: 
-        - local-app-be
+  # local-app-fe:
+  #     build: 
+  #       context: .
+  #       dockerfile: ./docker/app-fe/Dockerfile
+  #     command: ["npm", "start"]
+  #     container_name: tplogistic-local-app-fe
+  #     ports:
+  #     - 6000:6000
+  #     env_file:
+  #       - "./env/$ENV.env"
+  #     depends_on:
+  #       - local-app-be
+  #     links: 
+  #       - local-app-be
 
   lb:
     build: 
@@ -85,10 +87,10 @@ services:
       - 80:80
     depends_on:
       - app-be
-      - app-fe
+      # - app-fe
     links: 
       - app-be
-      - app-fe
+      # - app-fe
 
   logging:
     build:

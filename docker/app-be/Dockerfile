@@ -4,4 +4,4 @@ WORKDIR /data
 RUN npm i
 ADD ../../services/backend/ /data  
 EXPOSE 3000
-CMD [ "npm", "run", "start" ]
+CMD [ "npm", "run", "start:prod" ]
