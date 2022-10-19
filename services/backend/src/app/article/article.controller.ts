@@ -1,6 +1,7 @@
 import { HttpService } from "@nestjs/axios";
 import { Body, Controller, Get, Post, Req } from "@nestjs/common";
 import { Request } from "express";
+import { firstValueFrom } from "rxjs";
 import { Article } from "./article.entity";
 import { ArticleService } from "./article.service";
 import { CreateArticleDto } from "./dto/create-article.dto";
@@ -17,15 +18,21 @@ export class ArticleController {
 
     @Get("/articles")
     async getArticles(@Req() request: Request): Promise<Article[]> {
-        const articles = await this.articleService.getArticleNoReplica();
-        this.httpService.get("http://logging:8000/", { data: articles })
-        return articles;
+        // console.log('Called at endpoint: /articles');
+
+        let articles: Article[] = []
+
+        await firstValueFrom(this.httpService.get("http://logging:80/log"))
 
         if (process.env.OPTIMIZED === 'false') {
-            return this.articleService.getArticleNoReplica();
+            articles = await this.articleService.getArticleNoReplica();
         } else {
-            return this.articleService.getArticles();
+            articles = await this.articleService.getArticles();
         }
+
+        return articles;
+
+
     }
 
     @Post("/article")
