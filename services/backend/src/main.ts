@@ -1,4 +1,4 @@
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, VersioningType } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app/app.module';
@@ -25,6 +25,11 @@ async function configApp(app: INestApplication) {
   app.setGlobalPrefix("/")
   app.useGlobalFilters(new CustomExceptionFilter());
   app.useGlobalInterceptors(new ResponseInterceptor())
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' })
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  })
 }
 
 async function documentingApp(app: INestApplication) {
@@ -41,8 +46,5 @@ async function documentingApp(app: INestApplication) {
   SwaggerModule.setup("/docs", app, document);
 
 }
-
-
-
 
 bootstrap();

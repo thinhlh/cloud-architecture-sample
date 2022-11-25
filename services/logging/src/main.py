@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import article
+from routers import logging
 app = FastAPI()
 
-app.include_router(article.router)
+app.include_router(logging.router)

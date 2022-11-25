@@ -3,4 +3,5 @@ COPY ./services/logging/requirements.txt /data/
 RUN pip install --no-cache-dir --upgrade -r /data/requirements.txt
 COPY ./services/logging/ /data/
 WORKDIR /data/src
+EXPOSE 80
 CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "80"]

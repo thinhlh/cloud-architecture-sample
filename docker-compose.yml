@@ -1,67 +1,108 @@
 version: '3'
 
 services:
-  db: 
+
+  neo4j:
+    image: neo4j
+    container_name: cloud-neo4j
+
+    ports:
+      - 7474:7474
+      - 7473:7473
+      - 7687:7687
+    env_file:
+      - "./env/$ENV.env"
+    volumes:
+      - ./docker/neo4j/plugins:/var/lib/neo4j/plugins
+      - ./docker/neo4j/data:/data/rdf
+      - ./docker/neo4j/config/apoc.conf:/var/lib/neo4j/conf/apoc.conf
+
+  postgres: 
     image: postgres
-    container_name: tplogistic-db
+    container_name: cloud-postgres
+    env_file:
+      - "./env/$ENV.env"
     expose:
       - 5432
-    environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
 
   cache:
     image: redis
-    container_name: tplogistic-cache
+    container_name: cloud-cache
+
+  # logging:
+  #   build:
+  #     context: .
+  #     dockerfile: ./docker/logging/Dockerfile
+  #   image: cloud-logging
+  #   container_name: cloud-logging
+
+  # logging:
+  #   build: 
+  #     context: .
+  #     dockerfile: ./docker/new-logging/Dockerfile
+  #   image: cloud-logging
+  #   container_name: cloud-logging
+
+  s3:
+    build:
+      context: .
+      dockerfile: ./docker/s3/Dockerfile
+    image: cloud-s3
     ports:
-      - 6379:6379
+      - 800:80
+    volumes:
+      - ./docker/s3/data:/data/data
+    container_name: cloud-s3
+
+  lb:
+    build: 
+      context: ./docker/nginx
+      dockerfile: Dockerfile    
+    image: cloud-lb
+    container_name: cloud-lb
+    ports:
+      - 80:80
+    depends_on:
+      - app-be
+      # - app-fe
+    links: 
+      - app-be
+      # - app-fe
+
+  app-fe:
+    build: 
+      context: .
+      dockerfile: ./docker/app-fe/Dockerfile
+    image: cloud-fe
+    ports:
+      - 3000:3000
+    container_name: cloud-fe
+    env_file:
+      - "./env/$ENV.env"
+    links: 
+      - lb
+      - s3
 
   app-be:
     build: 
       context: .
       dockerfile: ./docker/app-be/Dockerfile
-    env_file:
-      - "./env/$ENV.env"
-    environment:
-    - OPTIMIZED=$OPTIMIZED
-    depends_on:
-      - db
-      - cache
-    links: 
-      - db
-      - cache
-      - logging
-
-  local-app-be:
-    build: 
-      context: .
-      dockerfile: ./docker/app-be/Dockerfile
-    container_name: tplogistic-local-app-be
-    ports:
-      - 3000:3000
+    image: cloud-be
+    container_name: cloud-be
     env_file:
       - "./env/$ENV.env"
     environment:
       - OPTIMIZED=$OPTIMIZED
     depends_on:
-      - db
+      - neo4j
+      - postgres
       - cache
     links: 
-      - db
+      - postgres
+      - neo4j
       - cache
-      - logging
-
-  # app-fe:
-  #   build: 
-  #     context: .
-  #     dockerfile: ./docker/app-fe/Dockerfile
-  #   command: ["npm", "start"]
-  #   env_file:
-  #     - "./env/$ENV.env"
-  #   depends_on:
-  #     - app-be
-  #   links: 
-  #     - app-be
+      # - logging
+    restart: on-failure # We add this because neo4j initialization time take to much time
 
   # local-app-fe:
   #     build: 
@@ -77,23 +118,3 @@ services:
   #       - local-app-be
   #     links: 
   #       - local-app-be
-
-  lb:
-    build: 
-      context: ./docker/nginx
-      dockerfile: Dockerfile    
-    container_name: tplogistic-lb
-    ports:
-      - 80:80
-    depends_on:
-      - app-be
-      # - app-fe
-    links: 
-      - app-be
-      # - app-fe
-
-  logging:
-    build:
-      context: .
-      dockerfile: ./docker/logging/Dockerfile
-    container_name: tplogistic-logging

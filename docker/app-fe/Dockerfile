@@ -3,6 +3,5 @@ COPY ["./services/frontend/package.json", "./services/frontend/tsconfig.json", "
 WORKDIR /data
 RUN npm i
 COPY ./services/frontend/ /data/
-EXPOSE 6000
-ENV PORT=6000
-CMD [ "npm", "run", "build" ]
+EXPOSE 3000
+CMD [ "npm", "start"]
