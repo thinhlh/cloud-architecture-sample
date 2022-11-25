@@ -9,7 +9,7 @@ router = APIRouter(prefix="/v1")
 
 @router.post("/file/upload")
 def upload_file(file: UploadFile):
-    static_directory = os.getcwd()+'/data'
+    static_directory = '/statics'
     if not os.path.exists(static_directory):
         os.mkdir(static_directory)
     path = f'{static_directory}/{file.filename}'
@@ -21,7 +21,7 @@ def upload_file(file: UploadFile):
 
 @router.get("/files", response_class=FileResponse)
 def get_file(file: str):
-    path = os.getcwd()+f'/data/{file}'
+    path = f'/statics/{file}'
     if os.path.exists(path=path):
         return path
     else:

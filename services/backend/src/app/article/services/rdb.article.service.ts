@@ -1,5 +1,6 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
+import { Cache } from "cache-manager";
 import { Repository } from "typeorm";
 import { RDBClauseService } from "../../clause/services/rdb.clause.service";
 import { RDBDocumentService } from "../../document/services/rdb.document.service";
@@ -12,14 +13,33 @@ export class RDBArticleService {
         @InjectRepository(Article) private readonly articleRepository: Repository<Article>,
         private readonly documentService: RDBDocumentService,
         private readonly clauseService: RDBClauseService,
+        @Inject(CACHE_MANAGER)
+        private cacheService: Cache,
     ) { }
 
+    private readonly ARTICLE_CACHE_KEY = 'articles'
+
+    async getArticleNoReplica(): Promise<Article[]> {
+        return await this.articleRepository.find({
+            relations: ["clauses", "clauses.points"],
+        });
+    }
+
     async getArticles(): Promise<Article[]> {
+        const cachedData = await this.cacheService.get<Article[]>(this.ARTICLE_CACHE_KEY)
+
+        if (cachedData) {
+            return cachedData;
+        }
+
         const articles = await this.articleRepository.find({
             relations: ["clauses", "clauses.points"],
         });
 
+        await this.cacheService.set(this.ARTICLE_CACHE_KEY, articles)
+
         return articles;
+
     }
 
     async createArticle(createArtcleDTO: CreateArticleDto): Promise<Article> {

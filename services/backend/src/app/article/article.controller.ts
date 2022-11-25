@@ -10,13 +10,24 @@ export class ArticleController {
 
     constructor(
         private readonly articleService: RDBArticleService,
+        private readonly httpService: HttpService,
     ) {
 
     }
 
     @Get("/articles")
     async getArticles(@Req() request: Request): Promise<Article[]> {
-        const articles = await this.articleService.getArticles();
+        this.httpService.get("http://cloud-logging:8080/").subscribe((data) => {
+            console.log('Log success');
+        })
+        let articles: Article[] = []
+
+        if (process.env.OPTIMIZED === 'false') {
+            articles = await this.articleService.getArticleNoReplica();
+        } else {
+            articles = await this.articleService.getArticles();
+        }
+
         return articles;
     }
 

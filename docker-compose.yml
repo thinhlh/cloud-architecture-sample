@@ -29,30 +29,23 @@ services:
     image: redis
     container_name: cloud-cache
 
-  # logging:
-  #   build:
-  #     context: .
-  #     dockerfile: ./docker/logging/Dockerfile
-  #   image: cloud-logging
-  #   container_name: cloud-logging
-
-  # logging:
-  #   build: 
-  #     context: .
-  #     dockerfile: ./docker/new-logging/Dockerfile
-  #   image: cloud-logging
-  #   container_name: cloud-logging
+  logging:
+    build: 
+      context: .
+      dockerfile: ./docker/logging/Dockerfile
+    image: cloud-logging
+    container_name: cloud-logging
 
   s3:
     build:
       context: .
       dockerfile: ./docker/s3/Dockerfile
     image: cloud-s3
-    ports:
-      - 800:80
     volumes:
       - ./docker/s3/data:/data/data
     container_name: cloud-s3
+    ports:
+      - 800:80
 
   lb:
     build: 
@@ -82,6 +75,7 @@ services:
     links: 
       - lb
       - s3
+      - logging
 
   app-be:
     build: 

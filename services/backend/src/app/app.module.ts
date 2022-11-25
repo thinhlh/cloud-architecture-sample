@@ -1,4 +1,4 @@
-import { Module, OnApplicationBootstrap } from "@nestjs/common";
+import { CacheModule, Module, OnApplicationBootstrap } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { createReadStream, readFile } from "fs";
@@ -19,6 +19,7 @@ import { Question } from "./question/question.entity";
 import { QuestionModule } from "./question/question.module";
 import { GraphQuestionService } from "./question/services/graph.question.service";
 import { CommonModule } from "./common/common.module";
+import * as redisStore from 'cache-manager-redis-store';
 
 @Module({
   imports: [
@@ -36,6 +37,13 @@ import { CommonModule } from "./common/common.module";
       database: process.env.POSTGRES_DB,
       synchronize: true,
       autoLoadEntities: true,
+    }),
+    CacheModule.register({
+      isGlobal: true,
+      store: redisStore,
+      host: process.env.REDIS_HOST,
+      port: +process.env.REDIS_PORT,
+      ttl: 30,
     }),
     Neo4jModule.forRoot({
       scheme: "bolt",

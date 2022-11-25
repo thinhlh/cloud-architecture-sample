@@ -10,7 +10,7 @@ export default function Landing() {
     const [isLoading, setLoading] = useState(true)
 
     useEffect(() => {
-        axios.get('http://localhost:800/v1/articles').then((response) => {
+        axios.get('http://localhost:80/v1/articles').then((response) => {
             setTimeout(() => {
                 setLoading(false)
                 console.log(response.data)
@@ -54,7 +54,7 @@ export default function Landing() {
                                 </button>
                             </div>
                         </div>
-                        <img id='landing-logistic-intro-image' src="http://cloud-s3:80/v1/files?file=landing-logistic-intro.svg" alt='Landing Intro' />
+                        <img id='landing-logistic-intro-image' src="http://localhost:800/v1/files?file=landing-logistic-intro.svg" alt='Landing Intro' />
                     </div>
                     <p id="landing-under-intro-text">Always be an honest, enthusiastic and reliable companion for all domestic and international import and export enterprises.</p>
                 </div>
