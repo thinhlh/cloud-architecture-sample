@@ -1,11 +1,14 @@
 import { HttpModule } from "@nestjs/axios";
-import { Module } from "@nestjs/common";
+import { Module, OnModuleInit } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { readFile } from "fs";
 import { ClauseModule } from "../clause/clause.module";
 import { DocumentModule } from "../document/document.module";
 import { ArticleController } from "./article.controller";
 import { Article } from "./article.entity";
-import { ArticleService } from "./article.service";
+import { RDBArticleService } from "./services/rdb.article.service";
+import { CreateArticleDto } from "./dto/create-article.dto";
+import { GraphArticleService } from "./services/graph.article.service";
 
 @Module({
     imports: [
@@ -15,8 +18,7 @@ import { ArticleService } from "./article.service";
         ClauseModule,
     ],
     controllers: [ArticleController],
-    providers: [ArticleService],
+    providers: [RDBArticleService, GraphArticleService],
+    exports: [RDBArticleService, GraphArticleService]
 })
-export class ArticleModule {
-
-}
+export class ArticleModule { }

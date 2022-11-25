@@ -1,16 +1,17 @@
-import { Module } from "@nestjs/common";
+import { Module, OnModuleInit } from "@nestjs/common";
 import { TypeOrmModule } from "@nestjs/typeorm";
+import { readFile } from "fs";
 import { DocumentController } from "./document.controller";
 import { Document } from "./document.entity";
-import { DocumentService } from "./document.service";
+import { RDBDocumentService } from "./services/rdb.document.service";
+import { CreateDocumentDTO } from "./dto/create-document.dto";
+import { GraphDocumentService } from "./services/graph.document.service";
 
 @Module({
     imports: [TypeOrmModule.forFeature([Document])],
     controllers: [DocumentController],
-    providers: [DocumentService],
-    exports: [DocumentService]
+    providers: [RDBDocumentService, GraphDocumentService],
+    exports: [RDBDocumentService, GraphDocumentService]
 
 })
-export class DocumentModule {
-
-}
+export class DocumentModule { }
