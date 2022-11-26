@@ -1,6 +1,6 @@
 from fastapi.routing import APIRouter
 from fastapi.responses import FileResponse
-from fastapi import UploadFile, HTTPException
+from fastapi import UploadFile, HTTPException, Request
 import os
 import shutil
 
@@ -8,7 +8,7 @@ router = APIRouter(prefix="/v1")
 
 
 @router.post("/file/upload")
-def upload_file(file: UploadFile):
+def upload_file(file: UploadFile, req=Request()):
     static_directory = '/statics'
     if not os.path.exists(static_directory):
         os.mkdir(static_directory)
