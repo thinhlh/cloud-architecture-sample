@@ -45,7 +45,7 @@ services:
       - ./docker/s3/data:/data/data
     container_name: cloud-s3
     ports:
-      - 800:80
+      - 81:80
 
   lb:
     build: 
@@ -61,15 +61,16 @@ services:
     links: 
       - app-be
       # - app-fe
+    restart: on-failure
 
   app-fe:
     build: 
       context: .
       dockerfile: ./docker/app-fe/Dockerfile
     image: cloud-fe
+    container_name: cloud-fe
     ports:
       - 3000:3000
-    container_name: cloud-fe
     env_file:
       - "./env/$ENV.env"
     links: 
@@ -82,11 +83,11 @@ services:
       context: .
       dockerfile: ./docker/app-be/Dockerfile
     image: cloud-be
-    container_name: cloud-be
+    # container_name: cloud-be
     env_file:
       - "./env/$ENV.env"
     environment:
-      - OPTIMIZED=$OPTIMIZED
+      - OPTIMIZED=false
     depends_on:
       - neo4j
       - postgres
@@ -97,6 +98,8 @@ services:
       - cache
       # - logging
     restart: on-failure # We add this because neo4j initialization time take to much time
+    # deploy:
+    #   replicas: 3
 
   # local-app-fe:
   #     build: 

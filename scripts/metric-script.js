@@ -2,15 +2,16 @@ import { check } from "k6";
 import http from "k6/http";
 
 export default function () {
-  var url =
-    __ENV.OPTIMIZED === "true"
-      ? "http://host.docker.internal:80"
-      : "http://host.docker.internal:3000";
+  // var url =
+  //   __ENV.OPTIMIZED === "true"
+  //     ? "http://host.docker.internal:80"
+  //     : "http://host.docker.internal:3000";
 
-  url = "http://host.docker.internal:3000";
+  var url =
+    "http://host.docker.internal:81/v1/files?file=landing-logistic-intro.svg";
 
   console.log(url);
-  let res = http.get(url, { timeout: 60000 }); // 30s
+  let res = http.get(url, { timeout: 60000 }); // 60s
   check(
     res,
     {
